@@ -33,15 +33,15 @@
         const params = getQueryParams();
         const data = JSON.parse(params.data);
 
-		let tileUrl = null;
-		switch(data.tiles) {
-			case "nolabels":
-				tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
-				break;
-			default:
-				tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-				break;
-		}
+        let tileUrl = null;
+        switch(data.tiles) {
+            case "nolabels":
+                tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
+                break;
+            default:
+                tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                break;
+        }
         L.tileLayer(tileUrl, {
             maxZoom: 19,
         }).addTo(map);
@@ -57,16 +57,21 @@
             item: L.icon({ iconUrl: './static/img/House.png', iconSize: [25, 25], iconAnchor: [12, 12] })
         };
 
-        // Function to add markers
-        function addMarker(data) {
+        // Function to add markers and fit bounds
+        function addMarkersAndFitBounds(data) {
+            const bounds = L.latLngBounds(); // Create a new bounds object
+
             for (const key in data.geoinfo) {
                 const { lat, lon } = data.geoinfo[key];
                 const marker = L.marker([lat, lon], { icon: icons[key] || icons.item }).addTo(map);
+                bounds.extend([lat, lon]); // Extend the bounds to include the marker's location
             }
+
+            map.fitBounds(bounds); // Fit the map to the bounds
         }
 
-        // Add markers to the map
-        addMarker(data);
+        // Add markers to the map and fit bounds
+        addMarkersAndFitBounds(data);
     </script>
 </body>
 </html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Markers</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body { margin: 0; }
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Function to get query parameters
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const regex = /([^&=]+)=([^&]*)/g;
+            let m;
+            while (m = regex.exec(queryString)) {
+                params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            }
+            return params;
+        }
+
+        // Initialize the map
+        const map = L.map('map').setView([22, 114], 13);
+
+        // Get data from query parameters
+        const params = getQueryParams();
+        const data = JSON.parse(params.data);
+
+		let tileUrl = null;
+		switch(data.tiles) {
+			case "nolabels":
+				tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
+				break;
+			default:
+				tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+				break;
+		}
+        L.tileLayer(tileUrl, {
+            maxZoom: 19,
+        }).addTo(map);
+
+        const icons = {
+            user: L.icon({ iconUrl: './static/img/User.png', iconSize: [25, 25], iconAnchor: [12, 12] }),
+            r1: L.icon({ iconUrl: './static/img/R1.png', iconSize: [25, 25], iconAnchor: [12, 12] }),
+            r2: L.icon({ iconUrl: './static/img/R2.png', iconSize: [25, 25], iconAnchor: [12, 12] }),
+            r3: L.icon({ iconUrl: './static/img/R3.png', iconSize: [25, 25], iconAnchor: [12, 12] }),
+            r4: L.icon({ iconUrl: './static/img/R4.png', iconSize: [25, 25], iconAnchor: [12, 12] }),
+            r5: L.icon({ iconUrl: './static/img/R5.png', iconSize: [25, 25], iconAnchor: [12, 12] }),
+            r6: L.icon({ iconUrl: './static/img/R6.png', iconSize: [25, 25], iconAnchor: [12, 12] }),
+            item: L.icon({ iconUrl: './static/img/House.png', iconSize: [25, 25], iconAnchor: [12, 12] })
+        };
+
+        // Function to add markers
+        function addMarker(data) {
+            for (const key in data.geoinfo) {
+                const { lat, lon } = data.geoinfo[key];
+                const marker = L.marker([lat, lon], { icon: icons[key] || icons.item }).addTo(map);
+            }
+        }
+
+        // Add markers to the map
+        addMarker(data);
+    </script>
+</body>
+</html>
